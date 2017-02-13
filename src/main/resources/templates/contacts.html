@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SpringContacts</title>
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" href="css/bootstrap.min.css" />
+        <style>
+            form p {
+                margin-top: 5px;
+                margin-bottom: 0px;
+            }
+        </style>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/angular.min.js"></script>
+    </head>
+    <body ng-app="SpringContacts" ng-controller="Con">
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/">SpringContacts</a>
+                </div>
+                <ul class="nav navbar-nav">
+                    <li>
+                        <form action="/search" method="post">
+                            <input type="text" style="max-width: 250px; margin-top: 5px;" class="form-control" name="search" placeholder="Search..." />
+                        </form>
+                    </li>
+                    <li><a href="#" data-toggle="modal" data-target=".bs-example-modal-sm" ng-click="clear()">Add</a></li>
+                </ul>
+            </div>
+        </nav>
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>name</th>
+                    <th>surname</th>
+                    <th>phone</th>
+                    <th>email</th>
+                    <th>options</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-th-each="c : ${contacts}">
+                    <td data-th-text="${c.name}"></td>
+                    <td data-th-text="${c.surname}"></td>
+                    <td data-th-text="${c.phone}"></td>
+                    <td data-th-text="${c.email}"></td>
+                    <td>
+                        <button type="button" 
+                                class="btn btn-primary btn-sm" 
+                                data-toggle="modal" 
+                                data-target=".bs-example-modal-sm" 
+                                data-th-attr="ng-click='editContact(\'' + ${c.name} + '\', \'' + ${c.surname} + '\', \'' + ${c.phone} + '\', \'' + ${c.email} + '\', \'' + ${c.id} + '\')'"
+                                >
+                            Edit
+                        </button>
+                        <a data-th-href="'/delete/' + ${c.id}" class="btn btn-danger btn-sm" onclick="return confirm('Delete this contact?')">Delete</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                       <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                       <h4 class="modal-title" ng-bind="header"></h4>
+                    </div>
+                    <form id="form" action="{{action}}" method="post" data-th-object="${contact}">
+                        <div class="modal-body" style="background-color: #222222; color: #FFFFFF;">
+                                <p>name:</p>
+                                <input type="text" data-th-field="*{name}" class="form-control" ng-value="name" />
+                                <p>surname:</p>
+                                <input type="text" data-th-field="*{surname}" class="form-control" ng-value="surname" />
+                                <p>phone:</p>
+                                <input type="text" data-th-field="*{phone}" class="form-control" ng-value="phone" />
+                                <p>email:</p>
+                                <input type="text" data-th-field="*{email}" class="form-control" ng-value="email" />
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <input type="submit" class="btn btn-primary" value="Save" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script>
+            var app = angular.module('SpringContacts', []);
+            app.controller('Con', function($scope) {
+                $scope.resetForm = function() {
+                    $scope.name = null;
+                    $scope.surname = null;
+                    $scope.phone = null;
+                    $scope.email = null;
+                    document.getElementById('form').reset();
+                };
+                $scope.clear = function() {
+                    $scope.action = '/add';
+                    $scope.header = 'New contact';
+                    $scope.resetForm();
+                };
+                $scope.editContact = function(name, surname, phone, email, id) {
+                    $scope.action = '/edit/' + id;
+                    $scope.header = 'Edit contact';
+                    $scope.resetForm();
+                    $scope.name = name;
+                    $scope.surname = surname;
+                    $scope.phone = phone;
+                    $scope.email = email;
+                };
+            });
+        </script>
+    </body>
+</html>
